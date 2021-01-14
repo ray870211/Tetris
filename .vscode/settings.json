@@ -1,0 +1,13 @@
+{
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    },
+    "java.dependency.packagePresentation": "flat",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\RAY\\Downloads\\mysql-connector-java-8.0.22\\mysql-connector-java-8.0.22.jar"
+    ]
+}
