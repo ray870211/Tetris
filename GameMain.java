@@ -18,13 +18,13 @@ public class GameMain extends JFrame {
     private JButton btn_stop = new JButton("Stop");
 
     // 遊戲地圖
-    private int colMap = 12;
-    private int rowMap = 20;
+    private int colMap = 16; // 16是因為4*4的方塊在map上最大最小值會左右各超過兩格
+    private int rowMap = 22; // y+2是下面超過的部分
     private int mapGame[][] = new int[colMap][rowMap];
     // 方塊大小
     private int squareW = 15;
     // 座標
-    private int x = 1; // 起始座標是115
+    private int x = 2; // 起始座標是115
     private int y = 1; // 起始座標是115
 
     private int shapesX = 0; // 表示方塊
@@ -155,22 +155,20 @@ public class GameMain extends JFrame {
         // x = 4;
         // y = 0;
         // }
-
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                if (mapGame[x + i][y + j + 1] == 1) { // 如果下一格有方塊，
+                if (mapGame[x + i][y + j + 1] == 1 || mapGame[x + i][y + j + 1] == 2) { // 如果下一格有方塊，
                     if (shapes[shapesX][shapesY][(4 * i) + j] == 1) {
                         mapGame[(x - 1) + i][(y - 2) + j] = 1;
                     }
                     createShapes();
                     System.out.print(shapesX + "\n" + shapesY);
+                    y = 0;
                 }
-                if (mapGame[x + i - 1][y + j] == 1 || mapGame[x + i - 1][y + j] == 2) { // 如果左邊有方塊
-                    x = 1;
+                if (mapGame[x + i + 1][y] == 1) { // 如果左邊有方塊
+                    System.out.println("超出範圍");
                 }
-                if (mapGame[x + i + 1][y + j] == 1 || mapGame[x + i - 1][y + j] == 2) { // 如果右邊有方塊
-                    x = 8;
-                }
+
             }
         }
 
@@ -188,7 +186,7 @@ public class GameMain extends JFrame {
             }
 
         };
-        timer.schedule(task, 300, 300); // 控制開始時間跟落下速度
+        timer.schedule(task, 2300, 2300); // 控制開始時間跟落下速度
 
     }
 
@@ -205,11 +203,11 @@ public class GameMain extends JFrame {
 
     public void initMap() { // 初始地圖
         for (int i = 0; i < colMap; i++) {
-            mapGame[i][19] = 2; // 最後一行是地圖邊界id=2 //這裡陣列一直超過索引，忘記陣列從0算
+            mapGame[i][21] = 2; // 最後一行是地圖邊界id=2 //這裡陣列一直超過索引，忘記陣列從0算
         }
         for (int j = 0; j < rowMap; j++) {
-            mapGame[0][j] = 2;
-            mapGame[11][j] = 2;
+            mapGame[1][j] = 2;
+            mapGame[14][j] = 2;
         }
     }
 
