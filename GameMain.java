@@ -17,9 +17,10 @@ public class GameMain extends JFrame {
     private JButton btn_start = new JButton("Start");
     private JButton btn_stop = new JButton("Stop");
     private JButton btn_restart = new JButton("重新開始");
-    private JLabel jab_point = new JLabel("point");
     private JLabel jLabel_dif = new JLabel("難度調整(建議100~1000)");
     private JTextArea jtex_dif = new JTextArea("500");
+    private JLabel jlb_message = new JLabel("遊戲訊息:");
+    private JLabel message = new JLabel("下左右移動方塊，上可以改變方塊方向。");
 
     // 遊戲地圖
     private int colMap = 16; // 16是因為4*4的方塊在map上最大最小值會左右各超過兩格
@@ -34,13 +35,16 @@ public class GameMain extends JFrame {
     private int point = 0;
     // 計數器
     private int count;
+    // 可不可以移動
+    private boolean isMove = true;
+    // 難度
     private int dif = 500;
     private int shapesX = 0; // 表示方塊
     private int shapesY = 0; // 表示狀態
     private Timer timer;
     private TimerTask task;
 
-    private final int shapes[][][] = new int[][][] { // 方塊表示，用這個建立4*4的方塊，且不能被改動
+    private final int shapes[][][] = new int[][][] { // 方塊表示，用這個建立4*4的方塊，且不能被改動(final)
             // T型
             { { 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 }, { 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
                     { 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -82,7 +86,8 @@ public class GameMain extends JFrame {
         jpnr.add(btn_restart);
         jpnr.add(jLabel_dif);
         jpnr.add(jtex_dif);
-
+        jpnr.add(jlb_message);
+        jpnr.add(message);
         this.addWindowFocusListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
@@ -115,46 +120,64 @@ public class GameMain extends JFrame {
                 System.out.print("x=" + x + "," + "y=" + y + "\n");
                 if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                     checkLine();
-                    y += 1;
+                    for (int i = 0; i < 4; i++) { // 判斷能不能移動的部分
+                        for (int j = 3; j >= 0; j--) {
+                            if (shapes[shapesX][shapesY][(4 * i) + j] == 1) {
+                                if (mapGame[x + i][y + j + 1] == 1 || mapGame[x + i + 1][y + j + 1] == 2) { // 當左邊有方塊時
+                                    isMove = false;
+                                    System.out.print(isMove);
+                                }
+                            }
+                        }
+                    }
+                    if (isMove == true) { // 當迴圈完還是true 代表旁邊沒有方塊
+                        y += 1;
+                    } else {
+                        isMove = true; // 如果是false的話，先設定回true
+                    }
 
                 }
                 System.out.print("x=" + x + "," + "y=" + y + "\n");
                 display();
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    x -= 1;
-                    if (x < 2) {
-                        x = 2;
-                    }
-                    for (int i = 3; i >= 0; i--) {
-                        for (int j = 3; j >= 0; j--) {
-                            if (shapes[shapesX][shapesY][(4 * i) + j] == 1) {
-                                if (mapGame[x + i - 1][y + j] == 1) { // 當左邊有方塊十
-                                    System.out.print("碰到左");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    System.out.print("x=" + x + "," + "y=" + y + "\n");
-                    display();
-                }
 
-                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    x += 1;
-                    if (x > 12) {
-                        x = 12;
-                    }
                     for (int i = 0; i < 4; i++) {
                         for (int j = 3; j >= 0; j--) {
                             if (shapes[shapesX][shapesY][(4 * i) + j] == 1) {
-                                if (mapGame[x + i + 1][y + j] == 1) { // 右邊有方塊時
-                                    System.out.print("碰到右");
-
-                                    break;
+                                if (mapGame[x + i - 1][y + j] == 1 || mapGame[x + i - 1][y + j] == 2) { // 當左邊有方塊十
+                                    isMove = false;
+                                    System.out.print(isMove);
                                 }
                             }
                         }
                     }
+                    if (isMove == true) {
+                        x -= 1;
+                    } else {
+                        isMove = true;
+                    }
+                    System.out.print("x=" + x + "," + "y=" + y + "\n");
+                    display();
+
+                }
+
+                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                    for (int i = 0; i < 4; i++) {
+                        for (int j = 3; j >= 0; j--) {
+                            if (shapes[shapesX][shapesY][(4 * i) + j] == 1) {
+                                if (mapGame[x + i + 1][y + j] == 1 || mapGame[x + i + 1][y + j] == 2) { // 當左邊有方塊十
+                                    isMove = false;
+                                    System.out.print(isMove);
+                                }
+                            }
+                        }
+                    }
+                    if (isMove == true) {
+                        x += 1;
+                    } else {
+                        isMove = true;
+                    }
+
                     System.out.print("x=" + x + "," + "y=" + y + "\n");
                     display();
                 }
@@ -166,7 +189,7 @@ public class GameMain extends JFrame {
             public void keyTyped(KeyEvent e) { // 按住與放開
             }
         });
-        this.addFocusListener(new FocusListener() {
+        this.addFocusListener(new FocusListener() { // 如果沒有焦點的話鍵盤就不能用
             @Override
             public void focusLost(FocusEvent e) {
                 System.out.println("Lost Focus");
@@ -191,7 +214,7 @@ public class GameMain extends JFrame {
         this.repaint();
     }
 
-    public void checkLine() { // 判斷
+    public void checkLine() { // 判斷與放置方塊
         for (int i = 0; i < 4; i++) {
             for (int j = 3; j >= 0; j--) {
                 if (shapes[shapesX][shapesY][(4 * i) + j] == 1) { // 如果從當前方塊找到1
@@ -210,6 +233,13 @@ public class GameMain extends JFrame {
                         y = 1;
                     }
                 }
+            }
+        }
+        for (int i = 0; i < 12; i++) { // 判斷遊戲結束
+            if (mapGame[i][1] == 1) {
+                stopGame();
+                restartGame();
+                message.setText("遊戲結束囉，你得了" + point + "分");
             }
         }
     }
